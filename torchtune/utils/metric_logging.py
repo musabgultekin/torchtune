@@ -49,7 +49,7 @@ class MetricLoggerInterface(Protocol):
     def close(self) -> None:
         """
         Close log resource, flushing if necessary.
-        Logs should not be written after `close` is called.
+        Logs should not be written after ``close`` is called.
         """
         pass
 
@@ -136,9 +136,9 @@ class WandBLogger(MetricLoggerInterface):
 
     Note:
         This logger requires the wandb package to be installed.
-        You can install it with `pip install wandb`.
+        You can install it with ``pip install wandb``.
         In order to use the logger, you need to login to your WandB account.
-        You can do this by running `wandb login` in your terminal.
+        You can do this by running ``wandb login`` in your terminal.
     """
 
     def __init__(
@@ -183,12 +183,12 @@ class TensorBoardLogger(MetricLoggerInterface):
 
     Args:
         log_dir (str): TensorBoard log directory
-        organize_logs (bool): If `True`, this class will create a subdirectory within `log_dir` for the current
+        organize_logs (bool): If `True``, this class will create a subdirectory within ``log_dir`` for the current
             run. Having sub-directories allows you to compare logs across runs. When TensorBoard is
             passed a logdir at startup, it recursively walks the directory tree rooted at logdir looking for
             subdirectories that contain tfevents data. Every time it encounters such a subdirectory,
             it loads it as a new run, and the frontend will organize the data accordingly.
-            Recommended value is `True`. Run `tensorboard --logdir my_log_dir` to view the logs.
+            Recommended value is ``True``. Run ``tensorboard --logdir my_log_dir`` to view the logs.
         **kwargs: additional arguments
 
     Example:
@@ -200,8 +200,8 @@ class TensorBoardLogger(MetricLoggerInterface):
 
     Note:
         This utility requires the tensorboard package to be installed.
-        You can install it with `pip install tensorboard`.
-        In order to view TensorBoard logs, you need to run `tensorboard --logdir my_log_dir` in your terminal.
+        You can install it with ``pip install tensorboard``.
+        In order to view TensorBoard logs, you need to run ``tensorboard --logdir my_log_dir`` in your terminal.
     """
 
     def __init__(self, log_dir: str, organize_logs: bool = True, **kwargs):

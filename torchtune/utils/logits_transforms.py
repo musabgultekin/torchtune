@@ -24,7 +24,7 @@ class TemperatureTransform(LogitsTransform):
     Args:
         temperature (float): The parameter controlling distribution randomness.
     Raises:
-        ValueError: If `temperature` is less than or equal to zero.
+        ValueError: If ``temperature <= 0``.
     """
 
     def __init__(self, temperature: float):
@@ -40,12 +40,12 @@ class TemperatureTransform(LogitsTransform):
 
 class TopPTransform(LogitsTransform):
     """Filters the distribution to cover the fewest tokens whose cumulative mass
-    exceeds `prob`.
+    exceeds ``prob``.
     Args:
         prob (float): The minimum cumulative probability mass that the kept tokens
             must cover.
     Raises:
-        ValueError: If `prob` is less than or equal to zero or greater than one.
+        ValueError: If ``0 >= prob > 1``
     """
 
     def __init__(self, prob: float):
@@ -72,8 +72,8 @@ class TopKTransform(LogitsTransform):
     Args:
         top_k (int): The number of highest probability tokens to keep.
     Raises:
-        ValueError: If `top_k` is less than or equal to zero.
-        TypeError: If `top_k` is not an integer.
+        ValueError: If ``top_k <= 0``
+        TypeError: If ``top_k`` is not an integer.
     """
 
     def __init__(self, top_k: int):

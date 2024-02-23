@@ -44,21 +44,21 @@ def save_checkpoint(
     model_key_filter: Optional[Callable[[str], bool]] = None,
 ) -> None:
     """
-    Saves `ckpt_dict` to `output_loc`. `ckpt_dict` is expected to have at least a key `model` which represents
-    the model to be checkpointed. This function will call `state_dict` in a distributed-aware fashion on checkpointable objects
+    Saves ``ckpt_dict`` to ``output_loc``. ``ckpt_dict`` is expected to have at least a key ``model`` which represents
+    the model to be checkpointed. This function will call ``state_dict`` in a distributed-aware fashion on checkpointable objects
     (currently only objects specified by "model" and "optimizer" keys). For distributed jobs, only rank 0
     will write out a checkpoint.
     Only full (unsharded) checkpoints are supported currently, i.e. full checkpoints are taken even if model and optimizer
     are sharded with FSDP.
 
     Args:
-        ckpt_dict (Dict[str, Any]): Dictionary containing the checkpoint to be saved. Must have at least `model` key.
+        ckpt_dict (Dict[str, Any]): Dictionary containing the checkpoint to be saved. Must have at least ``model`` key.
         output_loc (str): Local path to save the checkpoint to.
         model_key_filter (Optional[Callable[[str], bool]]): Optional function to filter the keys in the model state dict.
             This function should return True if the key is intended to be included in the saved checkpoint
             and False otherwise.
     Raises:
-        RuntimeError: If `ckpt_dict` does not contain a `model` key.
+        RuntimeError: If ``ckpt_dict`` does not contain a ``model`` key.
 
     Example:
         >>> output_loc = "/tmp/output.pt"
@@ -97,27 +97,27 @@ def load_checkpoint(
     optimizer: Optional[optim.Optimizer] = None,
 ) -> Dict[str, Any]:
     """
-    Loads a checkpoint from `ckpt_path` into `model` and optionally `optimizer`. This function is meant to be used in tandem with
-    `save_checkpoint` and assumes the checkpoint was saved as such. At minimum, the checkpoint needs to contain a `model` key that
+    Loads a checkpoint from ``ckpt_path`` into ``model`` and optionally ``optimizer``. This function is meant to be used in tandem with
+    ``save_checkpoint`` and assumes the checkpoint was saved as such. At minimum, the checkpoint needs to contain a ``model`` key that
     maps to the model's states.
 
-    NOTE: `load_checkpoint` does NOT load model and optimizer states into the model and optimizer respectively.
-    `load_checkpoint` handles the appropriate transformations (i.e. related to FSDP), but user is expected to
-    call `load_state_dict` on the returned results.
+    NOTE: ``load_checkpoint`` does NOT load model and optimizer states into the model and optimizer respectively.
+    ``load_checkpoint`` handles the appropriate transformations (i.e. related to FSDP), but user is expected to
+    call ``load_state_dict`` on the returned results.
 
     Args:
         ckpt_path (str): String indicating local path to saved checkpoint file.
         model (nn.Module): Model that checkpoint will be loaded into.
         optimizer (Optional[optim.Optimizer]): Optimizer that optimizer state checkpoints will be loaded into. If not specified,
-            "optimizer" key in `ckpt_dict` will be ignored, if present. Default: `None`.
+            "optimizer" key in ``ckpt_dict`` will be ignored, if present. Default: `None`.
 
     Returns:
         ckpt_dict (Dict[str, Any]): Dictionary containing loaded objects. Objects in this dictionary can be used
             to restore model, optimizer, and any other checkpointed states.
 
     Raises:
-        RuntimeError: If `ckpt_dict` does not contain a `model` key.
-        RuntimeError: If `ckpt_dict` does not contain an `optimizer` key and an optimizer was passed in.
+        RuntimeError: If ``ckpt_dict`` does not contain a ``model`` key.
+        RuntimeError: If ``ckpt_dict`` does not contain an ``optimizer`` key and an optimizer was passed in.
 
     Example:
         >>> ckpt_dict = torchtune.utils.checkpoint.load_checkpoint(ckpt_path, model, optimizer)

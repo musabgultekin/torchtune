@@ -49,7 +49,7 @@ class CausalSelfAttention(nn.Module):
         num_heads (int): number of query heads. For MHA this is also the
             number of heads for key and value
         num_kv_heads (int): number of key and value heads. If specified,
-            user should ensure `num_heads` % `num_kv_heads` == 0. Default value is
+            user should ensure ``num_heads % num_kv_heads == 0``. Default value is
             `None`, in which case this is the same as MHA
         head_dim (int): dimension of each head, calculated by ``embed_dim`` // ``num_heads``.
         q_proj (nn.Module): projection layer for query.
@@ -66,9 +66,9 @@ class CausalSelfAttention(nn.Module):
             self.training is False. Default value is 0.0.
 
     Raises:
-        ValueError: If `num_heads` % `num_kv_heads` != 0
-        ValueError: If `embed_dim` % `num_heads` != 0
-        ValueError: If `attn_dropout` < 0 or > 1
+        ValueError: If ``num_heads % num_kv_heads != 0``
+        ValueError: If ``embed_dim % num_heads != 0``
+        ValueError: If ``attn_dropout < 0 or > 1``
     """
 
     def __init__(

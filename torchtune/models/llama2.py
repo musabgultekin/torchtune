@@ -61,7 +61,7 @@ def _scale_hidden_dim_for_mlp(dim: int, multiple_of: int = 256) -> int:
 
     Args:
         dim (int): Input dimension.
-        multiple_of (int): Round scaled dimension to nearest multiple of `multiple_of` for clean computation.
+        multiple_of (int): Round scaled dimension to nearest multiple of ``multiple_of`` for clean computation.
 
     Returns:
         Scaled hidden dimension.

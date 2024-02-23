@@ -29,10 +29,10 @@ def set_seed(
     For more details, see https://pytorch.org/docs/stable/notes/randomness.html.
 
     Args:
-        seed (Optional[int]): the integer value seed. If `None`, a random seed will be generated and set.
+        seed (Optional[int]): the integer value seed. If ``None``, a random seed will be generated and set.
         debug_mode (Optional[Union[str, int]]): Controls debug_mode settings for deterministic operations within PyTorch.
 
-            * If `None`, don't set any PyTorch global values.
+            * If ``None``, don't set any PyTorch global values.
             * If "default" or 0, don't error or warn on nondeterministic operations and additionally enable PyTorch CuDNN benchmark.
             * If "warn" or 1, warn on nondeterministic operations and disable PyTorch CuDNN benchmark.
             * If "error" or 2, error on nondeterministic operations and disable PyTorch CuDNN benchmark.

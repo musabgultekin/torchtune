@@ -41,18 +41,18 @@ class AlpacaDataset(Dataset):
 
     where `instruction`, `input`, and `output` are fields from the dataset.
 
-    Masking of the prompt during training is controlled by the `train_on_input` flag, which is
+    Masking of the prompt during training is controlled by the ``train_on_input`` flag, which is
     set to `True` by default (ref: https://github.com/tloen/alpaca-lora/blob/main/finetune.py#L49)
-    - If `train_on_input` is True, the prompt is used during training and
+    - If ``train_on_input=True``, the prompt is used during training and
     contributes to the loss.
-    - If `train_on_input` is False, the prompt is masked out (tokens replaced with -100)
+    - If ``train_on_input=False``, the prompt is masked out (tokens replaced with -100)
 
-    The version of the dataset used is controlled by the `use_clean` flag which set to False by default.
-    - If `use_clean` is True, then https://huggingface.co/datasets/yahma/alpaca-cleaned is used
-    - If `use_clean` is False, then https://huggingface.co/datasets/tatsu-lab/alpaca is used
+    The version of the dataset used is controlled by the ``use_clean`` flag which set to False by default.
+    - If ``use_clean=True``, then https://huggingface.co/datasets/yahma/alpaca-cleaned is used
+    - If ``use_clean=False``, then https://huggingface.co/datasets/tatsu-lab/alpaca is used
 
     Args:
-        tokenizer (Tokenizer): Tokenizer used to encode data. Tokenize must implement an `encode` and `decode` method.
+        tokenizer (Tokenizer): Tokenizer used to encode data. Tokenize must implement an ``encode`` and ``decode`` method.
         train_on_input (bool): Whether the model is trained on the prompt or not. Default is True.
         use_clean (bool): Whether to use the cleaned version of the dataset or not. Default is False.
         **kwargs: Additional keyword arguments to pass to the Alpaca Dataset.

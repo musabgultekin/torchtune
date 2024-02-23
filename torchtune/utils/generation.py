@@ -29,11 +29,11 @@ class GenerationUtils:
         eos_id (int): End-of-sequence token ID.
 
     NOTE:
-        Currently, `decoder_lm` assumes a forward API with the signature
-        `def forward(x: torch.Tensor, curr_pos: int)` as the index of the
+        Currently, ``decoder_lm`` assumes a forward API with the signature
+        ``def forward(x: torch.Tensor, curr_pos: int)`` as the index of the
         current token is passed in for kv-caching during incremental decoding.
-        If `decoder_lm` does not support this interface, please set
-        `incremental_decode` to `False` when calling `generate` function.
+        If ``decoder_lm`` does not support this interface, please set
+        ``incremental_decode=False`` when calling ``generate`` function.
     """
 
     def __init__(self, decoder_lm: nn.Module, pad_id: int, eos_id: int):
@@ -119,7 +119,7 @@ class GenerationUtils:
                 Defaults to torch.device("cpu").
 
         Returns:
-            Tuple[Tensor, Optional[Tensor]]: Tuple of generated tokens and optional log probabilities if `logprobs=True`,
+            Tuple[Tensor, Optional[Tensor]]: Tuple of generated tokens and optional log probabilities if ``logprobs=True``,
             where the dimensions of each tensor are (batch_size, max_gen_length)
 
         Example:

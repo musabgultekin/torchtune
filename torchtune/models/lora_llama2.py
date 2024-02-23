@@ -82,7 +82,7 @@ def _lora_llama_self_attention(
         num_heads (int): number of query heads. For MHA this is also the
             number of heads for key and value
         num_kv_heads (int): number of key and value heads. If specified,
-            user should ensure `num_heads` % `num_kv_heads` == 0. Default value is
+            user should ensure ``num_heads % num_kv_heads == 0``. Default value is
             `None`, in which case this is the same as MHA
         max_seq_len (int): maximum sequence length the model will be run with, as used
             by :func:`~torchtune.modules.KVCache`
@@ -186,7 +186,7 @@ def lora_llama2(
         num_heads (int): number of query heads. For MHA this is also the
             number of heads for key and value
         num_kv_heads (int): number of key and value heads. If specified,
-            user should ensure `num_heads` % `num_kv_heads` == 0. Default value is
+            user should ensure ``num_heads % num_kv_heads == 0``. Default value is
             `None`, in which case this is the same as MHA
         embed_dim (int): embedding dimension for self-attention
         max_seq_len (int): maximum sequence length the model will be run with, as used

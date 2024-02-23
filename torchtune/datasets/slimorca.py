@@ -36,21 +36,21 @@ class SlimOrcaDataset(Dataset):
     The base Llama2 Model doesn't prescribe a particular format.
 
     The returned data is a tuple of input token id list and label token id
-    list. If `max_token_length` keyword argument is provided, the returned
+    list. If ``max_token_length`` keyword argument is provided, the returned
     input token id list is ensured (by truncation if necessary) to be within
     that length.
 
     Data input format: https://huggingface.co/datasets/Open-Orca/SlimOrca-Dedup#dataset-format
 
     Args:
-        tokenizer (Tokenizer): Tokenizer used to encode data. Tokenize must implement an `encode` and `decode` method.
+        tokenizer (Tokenizer): Tokenizer used to encode data. Tokenize must implement an ``encode`` and ``decode`` method.
         **kwargs: Additional keyword arguments to pass to the SlimOrca Dataset.
 
     Keyword Arguments:
         max_token_length (int): Maximum number of tokens in the returned input and label token id lists. This value needs to be at least 4 though it is generally set to max sequence length accepted by the model. Default is 1024.
 
     Raises:
-        ValueError: If `max_token_length` is less than 4.
+        ValueError: If ``max_token_length < 4``.
 
     Example:
         >>> ds = SlimOrcaDataset(tokenizer=tokenizer, max_token_length=10)
@@ -85,10 +85,10 @@ class SlimOrcaDataset(Dataset):
         Given a prompt string and label string, generate input and label token id lists.
 
         Tokenizer is used to tokenize both the strings.
-        The prompt token list is truncated to `max_token_length` - 2
+        The prompt token list is truncated to ``max_token_length - 2``
         (so that there is at least one label token, as EOS takes one token).
 
-        The label token list is truncated to `max_token_length` - len(prompt_token_list)
+        The label token list is truncated to ``max_token_length - len(prompt_token_list)``
 
         Finally input token list is the concatenation of prompt and label token lists.
 
