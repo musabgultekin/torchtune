@@ -13,7 +13,7 @@ dataset:
   _component_: torchtune.datasets.AlpacaDataset
   train_on_input: True
 seed: null
-shuffle: True
+shuffle: False
 
 # Model Arguments
 model:
