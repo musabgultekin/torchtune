@@ -74,7 +74,9 @@ class AlpacaDataset(IterableDataset):
         **kwargs,
     ) -> None:
         dataset_path = "yahma/alpaca-cleaned" if use_clean else "tatsu-lab/alpaca"
-        self._data = load_dataset(dataset_path, split="train")
+        self._data = load_dataset(dataset_path, split="train").to_iterable_dataset(
+            num_shards=4
+        )
         self._tokenizer = tokenizer
         self.train_on_input = train_on_input
         self.buffer = {
@@ -100,11 +102,13 @@ class AlpacaDataset(IterableDataset):
             self.buffer["input_ids"].extend(input_ids)
             self.buffer["labels"].extend(labels)
 
-            if len(self.buffer["input_ids"]) >= 1024:
-                packed_input_id = self.buffer["input_ids"][:1024]
-                packed_labels = self.buffer["labels"][:1024]
-                self.buffer["input_ids"] = self.buffer["input_ids"][1024:]
-                self.buffer["labels"] = self.buffer["labels"][1024:]
+            max_token_size = 2048
+
+            if len(self.buffer["input_ids"]) >= max_token_size:
+                packed_input_id = self.buffer["input_ids"][:max_token_size]
+                packed_labels = self.buffer["labels"][:max_token_size]
+                self.buffer["input_ids"] = self.buffer["input_ids"][max_token_size:]
+                self.buffer["labels"] = self.buffer["labels"][max_token_size:]
                 result = (packed_input_id, packed_labels)
                 yield result
 

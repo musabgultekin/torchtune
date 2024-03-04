@@ -274,6 +274,7 @@ class FullFinetuneRecipe(FTRecipeInterface):
         # )
         dataloader = DataLoader(
             dataset=ds,
+            num_workers=4,
             # sampler=sampler,
             collate_fn=partial(
                 utils.padded_collate,
