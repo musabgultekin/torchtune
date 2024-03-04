@@ -4,10 +4,11 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
+from datetime import datetime
 from typing import List, Tuple
 
 from datasets import load_dataset
-from torch.utils.data import Dataset
+from torch.utils.data import IterableDataset
 
 # Not ideal to import this type here but it's needed for the transform function
 from torchtune.modules import Tokenizer
@@ -29,7 +30,7 @@ _PROMPT_TEMPLATE = {
 }
 
 
-class AlpacaDataset(Dataset):
+class AlpacaDataset(IterableDataset):
     """
     Support for the Alpaca dataset and its variants from HuggingFace Datasets.
     https://huggingface.co/datasets/tatsu-lab/alpaca
@@ -76,18 +77,45 @@ class AlpacaDataset(Dataset):
         self._data = load_dataset(dataset_path, split="train")
         self._tokenizer = tokenizer
         self.train_on_input = train_on_input
+        self.buffer = {
+            "input_ids": [],
+            "labels": [],
+        }
 
-    def __len__(self):
-        return len(self._data)
+    # def __len__(self):
+    #     return len(self._data)
 
-    def __getitem__(self, index: int) -> Tuple[List[int], List[int]]:
-        sample = self._data[index]
+    def __iter__(self) -> Tuple[List[int], List[int]]:
+        for idx, sample in enumerate(self._data):
+            if idx % 100 == 0:
+                now = datetime.now()
+                current_time = now.strftime("%H:%M:%S")
+                print("Operating on ", idx, " Current Time =", current_time)
 
-        return self._transform(
-            instruction=sample["instruction"],
-            input=sample["input"],
-            output=sample["output"],
-        )
+            input_ids, labels = self._transform(
+                instruction=sample["instruction"],
+                input=sample["input"],
+                output=sample["output"],
+            )
+            self.buffer["input_ids"].extend(input_ids)
+            self.buffer["labels"].extend(labels)
+
+            if len(self.buffer["input_ids"]) >= 1024:
+                packed_input_id = self.buffer["input_ids"][:1024]
+                packed_labels = self.buffer["labels"][:1024]
+                self.buffer["input_ids"] = self.buffer["input_ids"][1024:]
+                self.buffer["labels"] = self.buffer["labels"][1024:]
+                result = (packed_input_id, packed_labels)
+                yield result
+
+    # def __getitem__(self, index: int) -> Tuple[List[int], List[int]]:
+    #     sample = self._data[index]
+
+    #     return self._transform(
+    #         instruction=sample["instruction"],
+    #         input=sample["input"],
+    #         output=sample["output"],
+    #     )
 
     def _transform(
         self, instruction: str, input: str, output: str
@@ -124,7 +152,8 @@ class AlpacaDataset(Dataset):
 
         assert len(encoded_prompt_with_response) == len(labels)
 
-        return encoded_prompt_with_response, labels
+        result = encoded_prompt_with_response, labels
+        return result
 
     def _generate_prompt(self, instruction: str, input: str) -> str:
         """

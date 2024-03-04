@@ -32,7 +32,7 @@ from torchtune.utils.constants import (
     TOTAL_EPOCHS_KEY,
 )
 
-from tqdm import tqdm
+# from tqdm import tqdm
 
 
 log = utils.get_logger("DEBUG")
@@ -143,7 +143,7 @@ class FullFinetuneRecipe(FTRecipeInterface):
 
         # sampler and dataloader depend on the tokenizer and loss_fn and should be
         # setup after both of these are initialized
-        self._sampler, self._dataloader = self._setup_data(
+        self._dataloader = self._setup_data(
             cfg_dataset=cfg.dataset,
             shuffle=cfg.shuffle,
             batch_size=cfg.batch_size,
@@ -164,15 +164,15 @@ class FullFinetuneRecipe(FTRecipeInterface):
         # by the dataloader, the max_steps_per_epoch param set by the user and the
         # gradient_accumulation_steps param. This value is used for logging and tracking
         # training state. The computation should happen after the dataloader has been setup
-        self._steps_per_epoch = (
-            len(self._dataloader) // self._gradient_accumulation_steps
-        )
-        if (
-            self.max_steps_per_epoch is not None
-            and self.max_steps_per_epoch < self._steps_per_epoch
-        ):
-            self._steps_per_epoch = self.max_steps_per_epoch
-        self.total_training_steps = self.epochs_run * self._steps_per_epoch
+        # self._steps_per_epoch = (
+        #     len(self._dataloader) // self._gradient_accumulation_steps
+        # )
+        # if (
+        #     self.max_steps_per_epoch is not None
+        #     and self.max_steps_per_epoch < self._steps_per_epoch
+        # ):
+        #     self._steps_per_epoch = self.max_steps_per_epoch
+        # self.total_training_steps = self.epochs_run * self._steps_per_epoch
 
     def _update_recipe_state(self, ckpt_dict: Dict[str, Any]) -> None:
         """
@@ -265,17 +265,16 @@ class FullFinetuneRecipe(FTRecipeInterface):
             cfg_dataset,
             tokenizer=self._tokenizer,
         )
-        sampler = DistributedSampler(
-            ds,
-            num_replicas=world_size,
-            rank=rank,
-            shuffle=shuffle,
-            seed=0,
-        )
+        # sampler = DistributedSampler(
+        #     ds,
+        #     num_replicas=world_size,
+        #     rank=rank,
+        #     shuffle=shuffle,
+        #     seed=0,
+        # )
         dataloader = DataLoader(
             dataset=ds,
-            batch_size=batch_size,
-            sampler=sampler,
+            # sampler=sampler,
             collate_fn=partial(
                 utils.padded_collate,
                 padding_idx=self._tokenizer.pad_id,
@@ -286,7 +285,7 @@ class FullFinetuneRecipe(FTRecipeInterface):
         if self._is_rank_zero:
             log.info("Dataset and Sampler are initialized.")
 
-        return sampler, dataloader
+        return dataloader
 
     def save_checkpoint(self, epoch: int) -> None:
         """
@@ -347,18 +346,9 @@ class FullFinetuneRecipe(FTRecipeInterface):
 
             # Update the sampler to ensure data is correctly shuffled across epochs
             # in case shuffle is True
-            self._sampler.set_epoch(curr_epoch)
-
-            for idx, batch in enumerate(
-                pbar := tqdm(self._dataloader, disable=not (rank == 0))
-            ):
-                if (
-                    self.max_steps_per_epoch is not None
-                    and (idx // self._gradient_accumulation_steps)
-                    == self.max_steps_per_epoch
-                ):
-                    break
-
+            # self._sampler.set_epoch(curr_epoch)
+            num_steps = 0
+            for batch in self._dataloader:
                 input_ids, labels = batch
                 input_ids = input_ids.to(self._device)
                 labels = labels.to(self._device)
@@ -374,22 +364,20 @@ class FullFinetuneRecipe(FTRecipeInterface):
 
                 # Note: We're always logging the loss before normalizing it
                 # Check if this is the norm or not
-                pbar.set_description(f"{curr_epoch+1}|{idx+1}|Loss: {loss.item()}")
 
-                if self.total_training_steps % self._log_every_n_steps == 0:
-                    self._metric_logger.log_dict(
-                        {
-                            "loss": loss.item(),
-                            "lr": self._optimizer.param_groups[0]["lr"],
-                            "gpu_resources": torch.cuda.memory_allocated(),
-                        },
-                        step=self.total_training_steps,
-                    )
+                self._metric_logger.log_dict(
+                    {
+                        "loss": loss.item(),
+                        "lr": self._optimizer.param_groups[0]["lr"],
+                        "gpu_resources": torch.cuda.memory_allocated(),
+                    },
+                    step=self.total_training_steps,
+                )
 
                 # Does loss normalization need to happen within autocast context?
                 loss = loss / self._gradient_accumulation_steps
                 self._grad_scaler.scale(loss).backward()
-                if self._should_update_weights(idx):
+                if True:
                     self._grad_scaler.step(self._optimizer)
                     self._grad_scaler.update()
                     self._optimizer.zero_grad(set_to_none=True)
