@@ -47,7 +47,7 @@ The library currently supports the following models and fine-tuning methods.
 
 ### Finetuning resource requirements
 
-Note: These resource requirements are based on GPU peak memory reserved during training using the specified configs. You may
+NOTE: These resource requirements are based on GPU peak memory reserved during training using the specified configs. You may
 experience different peak memory utilization based on changes made in configuration / training. Please see the linked configs in the table for specific settings such as batch size, FSDP, activation checkpointing, optimizer, etc used to obtain the peak memory. The specific HW resources specified are meant as an example for possible hardware that can be used.
 
 | Example HW Resources | Finetuning Method |  Config | Model | Peak Memory per GPU
