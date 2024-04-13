@@ -89,7 +89,7 @@ To get-started with fine-tuning your first LLM with torchtune, see our tutorial 
 
 &nbsp;
 
-#### Downloading a model
+### Downloading a model
 
 Follow the instructions on the official [`meta-llama`](https://huggingface.co/meta-llama/Llama-2-7b) repository to ensure you have access to the Llama2 model weights. Once you have confirmed access, you can run the following command to download the weights to your local machine. This will also download the tokenizer model and a responsible use guide.
 
@@ -104,7 +104,7 @@ You can find your token at https://huggingface.co/settings/tokens
 
 &nbsp;
 
-#### Fine-tuning recipes
+### Fine-tuning recipes
 
 torchtune provides the following fine-tuning recipes.
 
@@ -135,12 +135,11 @@ tune run --nproc_per_node 2 full_finetune_distributed --config llama2/7B_full_di
 
 &nbsp;
 
-> Tip: Make sure to place any torchrun commands **before** the recipe specification b/c any other CLI args will
-overwrite the config.
+> Tip: Make sure to place any torchrun commands **before** the recipe specification. Any CLI args after this will override the config and not impact distributed training.
 
 &nbsp;
 
-#### Modify Configs
+### Modify Configs
 
 There are two ways in which you can modify configs:
 
@@ -156,6 +155,7 @@ enable_activation_checkpointing=True \
 max_steps_per_epoch=128
 ```
 
+**Update a Local Copy**
 You can also copy the config to your local directory and modify the contents directly:
 
 ```bash
