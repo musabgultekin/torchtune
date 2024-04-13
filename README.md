@@ -21,7 +21,7 @@ torchtune provides:
 - YAML configs for easily configuring training, evaluation, quantization or inference recipes
 - Built-in support for many popular dataset formats and prompt templates to help you quickly get-started with training
 
-torchtune focuses on integrating with popular tools and libraries from the ecosystem. These are just a few examples, with more under development
+torchtune focuses on integrating with popular tools and libraries from the ecosystem. These are just a few examples, with more under development:
 
 - [Hugging Face Hub](https://huggingface.co/docs/hub/en/index) for accessing model weights
 - [EleutherAI's LM Eval Harness](https://github.com/EleutherAI/lm-evaluation-harness) for evaluating trained models
@@ -50,9 +50,9 @@ The library currently supports the following models.
 
 Currently, `torchtune` must be built via cloning the repository and installing.
 
-Step 1: Install Pytorch. torchtune is currently tested with the latest stable PyTorch release (2.2.2). We recommend following the instructions [here](https://pytorch.org/get-started/locally/) and installing either version 2.2.2 or the preview nightly version.
+**Step 1:** Install Pytorch. torchtune is currently tested with the latest stable PyTorch release (2.2.2). We recommend following the instructions [here](https://pytorch.org/get-started/locally/) and installing either version 2.2.2 or the preview nightly version.
 
-Step 2: Git clone torchtune and install dependencies.
+**Step 2:** Git clone torchtune and install dependencies.
 
 ```bash
 git clone https://github.com/pytorch/torchtune.git
@@ -85,16 +85,20 @@ options:
 
 ## Get Started
 
-To get-started with fine-tuning your first LLM with torchtune, see our tutorial on [Finetuning Llama2 with TorchTune](https://pytorch.org/torchtune/main/examples/first_finetune_tutorial.html). The tutorial on [End-to-End Workflow with torchtune](https://pytorch.org/torchtune/main/examples/e2e_flow.html) will show you how to evaluate, quantize and run inference with this model.
+To get-started with fine-tuning your first LLM with torchtune, see our tutorial on [fine-tuning Llama2 7B](https://pytorch.org/torchtune/main/examples/first_finetune_tutorial.html). Our [end-to-end workflow](https://pytorch.org/torchtune/main/examples/e2e_flow.html) tutorial will show you how to evaluate, quantize and run inference with this model. The rest of this section will provide a quick overview of these steps with Llama2.
 
-The rest of this section will provide a quick overview of these steps with Llama2.
+&nbsp;
 
 #### Downloading a model
 
 Follow the instructions on the official [`meta-llama`](https://huggingface.co/meta-llama/Llama-2-7b) repository to ensure you have access to the Llama2 model weights. Once you have confirmed access, you can run the following command to download the weights to your local machine. This will also download the tokenizer model and a responsible use guide.
 
+&nbsp;
+
 > Tip: Set your environment variable `HF_TOKEN` or pass in `--hf-token` to the command in order to validate your access.
 You can find your token at https://huggingface.co/settings/tokens
+
+&nbsp;
 
 ```bash
 tune download meta-llama/Llama-2-7b-hf \
@@ -106,10 +110,20 @@ tune download meta-llama/Llama-2-7b-hf \
 
 #### Running fine-tuning recipes
 
-torchtune provides the following fine-tuning recipes. Example configs for these recipes can be found [here](recipes/configs/).
-- Distributed recipes for [Full](https://github.com/pytorch/torchtune/blob/main/recipes/full_finetune_distributed.py) and [LoRA](https://github.com/pytorch/torchtune/blob/main/recipes/lora_finetune_distributed.py) fine-tuning which can be run on a single node (1 to 8 GPUs). Example configs for these recipes have the format ``<model_name>/<model_size>_<finetune_method>.yaml``
-- Single GPU recipes for [Full](https://github.com/pytorch/torchtune/blob/main/recipes/full_finetune_single_device.py) and [LoRA](https://github.com/pytorch/torchtune/blob/main/recipes/lora_finetune_distributed.py) fine-tuning which expose a number of memory optimizations that aren't available in the distributed version of the recipes. These include support for low-precision optimizers from [bitsandbytes](https://huggingface.co/docs/bitsandbytes/main/en/index) and fusing optimizer step with backward to reduce memory footprint from the gradients. Example configs for these recipes have the format ``<model_name>/<model_size>_<finetune_method>_low_memory.yaml``or  ``<model_name>/<model_size>_<finetune_method>_single_device.yaml``
-- QLoRA fine-tuning on single device. This uses the same recipe as LoRA single device. Currently distributed training for QLoRA is not supported. Example configs for these recipes have the format ``<model_name>/<model_size>_qlora_single_device.yaml``
+torchtune provides the following fine-tuning recipes.
+
+&nbsp;
+
+> Tip: Single GPU recipes expose a number of memory optimizations that aren't available in the distributed versions. These include support for low-precision optimizers from [bitsandbytes](https://huggingface.co/docs/bitsandbytes/main/en/index) and fusing optimizer step with backward to reduce memory footprint from the gradients. For memoy-constrained setups, we recommend using the single-device configs as a starting point
+
+&nbsp;
+
+
+| Training                           | Fine-tuning Method                 | Example Configs                                    |
+|------------------------------------|------------------------------------|----------------------------------------------------|
+| Distributed Training [1 to 8 GPUs] | [Full](recipes/full_finetune_distributed.py), [LoRA](recipes/lora_finetune_distributed.py)                 | [llama2/13B_full.yaml](), [mistral/7B.lora.yaml]() |
+| Single Device / Low Memory [1 GPU] | [Full](recipes/full_finetune_single_device.py), [LoRA and QLoRA](recipes/lora_finetune_single_device.py)       | [llama2/7B_full_low_memory.yaml](recipes/configs/llama2/7B_full_low_memory.yaml), [mistral/7B_qlora_single_device.yaml](recipes/configs/mistral/7B_qlora_single_device.yaml) |
+| Single Device [1 GPU]              | [DPO](recipes/lora_dpo_single_device.py)                            | [llama2/7B_lora_dpo_single_device.yaml](recipes/configs/llama2/7B_lora_dpo_single_device.yaml) |
 
 
 To run a LoRA fine-tune on a single device with llama2 7B using the [Alpaca Dataset](https://huggingface.co/datasets/tatsu-lab/alpaca):
@@ -122,6 +136,8 @@ torchtune's CLI integrates with [`torchrun`](https://pytorch.org/docs/stable/ela
 ```bash
 tune run --nproc_per_node 2 full_finetune_distributed --config llama2/7B_full_distributed
 ```
+
+&nbsp;
 
 > Tip: Make sure to place any torchrun commands **before** the recipe specification b/c any other CLI args will
 overwrite the config.
