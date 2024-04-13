@@ -108,18 +108,17 @@ You can find your token at https://huggingface.co/settings/tokens
 
 torchtune provides the following fine-tuning recipes.
 
-&nbsp;
-
-> Tip: Single GPU recipes expose a number of memory optimizations that aren't available in the distributed versions. These include support for low-precision optimizers from [bitsandbytes](https://huggingface.co/docs/bitsandbytes/main/en/index) and fusing optimizer step with backward to reduce memory footprint from the gradients. For memoy-constrained setups, we recommend using the single-device configs as a starting point
-
-&nbsp;
-
-
 | Training                           | Fine-tuning Method                 | Example Configs                                    |
 |------------------------------------|------------------------------------|----------------------------------------------------|
 | Distributed Training [1 to 8 GPUs] | [Full](recipes/full_finetune_distributed.py), [LoRA](recipes/lora_finetune_distributed.py)                 | [llama2/13B_full.yaml](), [mistral/7B.lora.yaml]() |
 | Single Device / Low Memory [1 GPU] | [Full](recipes/full_finetune_single_device.py), [LoRA and QLoRA](recipes/lora_finetune_single_device.py)       | [llama2/7B_full_low_memory.yaml](recipes/configs/llama2/7B_full_low_memory.yaml), [mistral/7B_qlora_single_device.yaml](recipes/configs/mistral/7B_qlora_single_device.yaml) |
 | Single Device [1 GPU]              | [DPO](recipes/lora_dpo_single_device.py)                            | [llama2/7B_lora_dpo_single_device.yaml](recipes/configs/llama2/7B_lora_dpo_single_device.yaml) |
+
+&nbsp;
+
+> Tip: Single GPU recipes expose a number of memory optimizations that aren't available in the distributed versions. These include support for low-precision optimizers from [bitsandbytes](https://huggingface.co/docs/bitsandbytes/main/en/index) and fusing optimizer step with backward to reduce memory footprint from the gradients. For memoy-constrained setups, we recommend using the single-device configs as a starting point
+
+&nbsp;
 
 
 To run a LoRA fine-tune on a single device with llama2 7B using the [Alpaca Dataset](https://huggingface.co/datasets/tatsu-lab/alpaca):
