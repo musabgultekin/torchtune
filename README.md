@@ -108,11 +108,11 @@ You can find your token at https://huggingface.co/settings/tokens
 
 torchtune provides the following fine-tuning recipes.
 
-| Training                           | Fine-tuning Method                 | Example Configs                                    |
-|------------------------------------|------------------------------------|----------------------------------------------------|
-| Distributed Training [1 to 8 GPUs] | [Full](recipes/full_finetune_distributed.py), [LoRA](recipes/lora_finetune_distributed.py)                 | [llama2/13B_full.yaml](), [mistral/7B.lora.yaml]() |
-| Single Device / Low Memory [1 GPU] | [Full](recipes/full_finetune_single_device.py), [LoRA and QLoRA](recipes/lora_finetune_single_device.py)       | [llama2/7B_full_low_memory.yaml](recipes/configs/llama2/7B_full_low_memory.yaml), [mistral/7B_qlora_single_device.yaml](recipes/configs/mistral/7B_qlora_single_device.yaml) |
-| Single Device [1 GPU]              | [DPO](recipes/lora_dpo_single_device.py)                            | [llama2/7B_lora_dpo_single_device.yaml](recipes/configs/llama2/7B_lora_dpo_single_device.yaml) |
+| Training                           | Fine-tuning Method                 |
+|------------------------------------|------------------------------------|
+| Distributed Training [1 to 8 GPUs] | Full [[code](recipes/full_finetune_distributed.py), [example](recipes/configs/llama2/13B_full.yaml)], LoRA [[code](recipes/lora_finetune_distributed.py), [example](recipes/configs/llama2/13B_lora.yaml)] |
+| Single Device / Low Memory [1 GPU] | Full [[code](recipes/full_finetune_distributed.py), [example](recipes/configs/llama2/13B_full.yaml)], LoRA + QLoRA [[code](recipes/lora_finetune_distributed.py), [example](recipes/configs/llama2/13B_lora.yaml)] |
+| Single Device [1 GPU]              | DPO [[code](recipes/full_finetune_distributed.py), [example](recipes/configs/llama2/13B_full.yaml)]
 
 &nbsp;
 
