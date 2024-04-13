@@ -104,7 +104,7 @@ You can find your token at https://huggingface.co/settings/tokens
 
 &nbsp;
 
-#### Running fine-tuning recipes
+#### Fine-tuning recipes
 
 torchtune provides the following fine-tuning recipes.
 
@@ -121,12 +121,13 @@ torchtune provides the following fine-tuning recipes.
 &nbsp;
 
 
-To run a LoRA fine-tune on a single device with llama2 7B using the [Alpaca Dataset](https://huggingface.co/datasets/tatsu-lab/alpaca):
+Llama2 7B + LoRA on single GPU + [Alpaca Dataset](https://huggingface.co/datasets/tatsu-lab/alpaca):
+
 ```bash
 tune run lora_finetune_single_device --config llama2/7B_lora_single_device
 ```
 
-torchtune's CLI integrates with [`torchrun`](https://pytorch.org/docs/stable/elastic/run.html) for easily running distributed training. To run LoRA full-tune on two GPUs with Llama2 7B using the [Alpaca Dataset](https://huggingface.co/datasets/tatsu-lab/alpaca)
+Llama2 7B + LoRA on two GPUs + [Alpaca Dataset](https://huggingface.co/datasets/tatsu-lab/alpaca):
 
 ```bash
 tune run --nproc_per_node 2 full_finetune_distributed --config llama2/7B_full_distributed
