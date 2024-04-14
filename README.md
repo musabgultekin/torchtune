@@ -29,7 +29,8 @@ torchtune focuses on integrating with popular tools and libraries from the ecosy
 - [PyTorch FSDP](https://pytorch.org/docs/stable/fsdp.html) for distributed training
 - [torchao](https://github.com/pytorch-labs/ao) for lower precision dtypes and post-training quantization techniques
 - [Weights and Biases](https://wandb.ai/site) for tracking training progress and logging metrics
-- [ExecuTorch](https://pytorch.org/executorch-overview) for on-device inference
+- [ExecuT
+orch](https://pytorch.org/executorch-overview) for on-device inference
 
 &nbsp;
 
@@ -38,7 +39,7 @@ The library currently supports the following models.
 | Model                                         | Sizes     |
 |-----------------------------------------------|-----------|
 | [Llama2](https://llama.meta.com/llama2/)   | 7B, 13B [[models](torchtune/models/llama2/_model_builders.py), [configs](recipes/configs/llama2/)]        |
-| [Mistral 7B](https://mistral.ai/news/announcing-mistral-7b/)   | 7B [[model](torchtune/models/mistral/_model_builders.py), [configs](recipes/configs/mistral/)] |
+| [Mistral](https://mistral.ai/news/announcing-mistral-7b/)   | 7B [[model](torchtune/models/mistral/_model_builders.py), [configs](recipes/configs/mistral/)] |
 | [Gemma](https://blog.google/technology/developers/gemma-open-models/)   | 2B [[model](torchtune/models/gemma/_model_builders.py), [configs](recipes/configs/gemma/)] |
 
 
