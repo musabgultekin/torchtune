@@ -159,14 +159,14 @@ max_steps_per_epoch=128
 You can also copy the config to your local directory and modify the contents directly:
 
 ```bash
-tune cp llama2/7B_full .
+tune cp llama2/7B_full ./my_custom_config.yaml
 Copied to ./7B_full.yaml
 ```
 
 Then, you can run your custom recipe by directing the `tune run` command to your local files:
 
 ```bash
-tune run full_finetune_distributed --config 7B_full.yaml
+tune run full_finetune_distributed --config ./my_custom_config.yaml
 ```
 
 &nbsp;
@@ -179,11 +179,11 @@ Check out `tune --help` for all possible CLI commands and options.
 
 torchtune embodies PyTorch’s design philosophy [[details](https://pytorch.org/docs/stable/community/design.html)], especially "usability over everything else".
 
-#### Native PyTorch
+### Native PyTorch
 
 torchtune is a native-PyTorch library. While we provide integrations with the surrounding ecosystem (eg: Hugging Face Datasets, EluetherAI Eval Harness), all of the core functionality is written in PyTorch.
 
-#### Simplicity and Extensibility
+### Simplicity and Extensibility
 
 torchtune is designed to be easy to understand, use and extend.
 
@@ -192,7 +192,7 @@ torchtune is designed to be easy to understand, use and extend.
 - Code duplication is prefered over unecessary abstractions
 - Modular building blocks over monolithic components
 
-#### Correctness
+### Correctness
 
 torchtune provides well-tested components with a high-bar on correctness. The library will never be the first to provide a feature, but available features will be thoroughly tested. We provide
 
