@@ -215,13 +215,13 @@ We really value our community and the contributions made by our awesome users. W
 
 The Llama2 code in this repository is inspired by the original [Llama2 code](https://github.com/meta-llama/llama/blob/main/llama/model.py).
 
-We want to give a huge shout-out to EleutherAI, Hugging Face and Weights and Biases for being wonderful collaborators and for contributing and for working with us on some of these integrations within torchtune.
+We want to give a huge shout-out to EleutherAI, Hugging Face and Weights and Biases for being wonderful collaborators and for working with us on some of these integrations within torchtune.
 
 We also want to acknowledge some awesome libraries and tools from the ecosystem:
 - [gpt-fast](https://github.com/pytorch-labs/gpt-fast) for performant LLM inference techniques which we've adopted OOTB
 - [llama recipes](https://github.com/meta-llama/llama-recipes) for spring-boarding the llama2 community
 - [bitsandbytes](https://github.com/TimDettmers/bitsandbytes) for bringing several memory and performance based techniques to the PyTorch ecosystem
-- [axolotl](https://github.com/OpenAccess-AI-Collective/axolotl) and [lit-gpt](https://github.com/Lightning-AI/litgpt)
+- [lit-gpt](https://github.com/Lightning-AI/litgpt)
 
 &nbsp;
 
