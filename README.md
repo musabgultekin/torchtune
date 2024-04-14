@@ -17,9 +17,11 @@ torchtune is a PyTorch-native library for easily authoring, fine-tuning and expe
 torchtune provides:
 
 - Native-PyTorch implementations of popular LLMs using composable and modular building blocks
-- Easy-to-use, hackable and memory-efficient training recipes for popular fine-tuning techniques (LoRA, QLoRA) - no trainers, no frameworks, just PyTorch!
+- Easy-to-use and hackable training recipes for popular fine-tuning techniques (LoRA, QLoRA) - no trainers, no frameworks, just PyTorch!
 - YAML configs for easily configuring training, evaluation, quantization or inference recipes
 - Built-in support for many popular dataset formats and prompt templates to help you quickly get-started with training
+
+Memory-efficiency is important to us. All of our recipes are tested on a variety of setups including commodity GPUs with 24GB of VRAM as well as beefier options found in data centers. More details can be found in the [fine-tuning recipes](#fine-tuning-recipes) section.
 
 torchtune focuses on integrating with popular tools and libraries from the ecosystem. These are just a few examples, with more under development:
 
@@ -117,6 +119,7 @@ torchtune provides the following fine-tuning recipes.
 | Single Device [1 GPU]              | DPO [[code](recipes/full_finetune_distributed.py), [example](recipes/configs/llama2/13B_full.yaml)]
 
 &nbsp;
+
 
 Single GPU recipes expose a number of memory optimizations that aren't available in the distributed versions. These include support for low-precision optimizers from [bitsandbytes](https://huggingface.co/docs/bitsandbytes/main/en/index) and fusing optimizer step with backward to reduce memory footprint from the gradients. For memory-constrained setups, we recommend using the single-device configs as a starting point. For example, our default QLoRA config has a peak memory usage of ``~9.3GB``. Similarly LoRA on single device with ``batch_size=2`` has a peak memory usage of ``~15.5GB``. Both of these are with ``dtype=bf16`` and ``AdamW`` as the optimizer.
 
