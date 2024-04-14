@@ -17,7 +17,7 @@ torchtune is a PyTorch-native library for easily authoring, fine-tuning and expe
 torchtune provides:
 
 - Native-PyTorch implementations of popular LLMs using composable and modular building blocks
-- Easy-to-use, hackable and memory-efficient training recipes for popular fine-tuning techniques (LoRA, QLoRA) - no trainers, no frameworks and < 600 lines of code!
+- Easy-to-use, hackable and memory-efficient training recipes for popular fine-tuning techniques (LoRA, QLoRA) - no trainers, no frameworks, just PyTorch!
 - YAML configs for easily configuring training, evaluation, quantization or inference recipes
 - Built-in support for many popular dataset formats and prompt templates to help you quickly get-started with training
 
@@ -41,6 +41,7 @@ The library currently supports the following models.
 | [Llama2](https://llama.meta.com/llama2/)   | 7B, 13B [[models](torchtune/models/llama2/_model_builders.py), [configs](recipes/configs/llama2/)]        |
 | [Mistral](https://huggingface.co/mistralai)   | 7B [[model](torchtune/models/mistral/_model_builders.py), [configs](recipes/configs/mistral/)] |
 | [Gemma](https://huggingface.co/collections/google/gemma-release-65d5efbccdbb8c4202ec078b)   | 2B [[model](torchtune/models/gemma/_model_builders.py), [configs](recipes/configs/gemma/)] |
+
 
 
 &nbsp;
@@ -117,7 +118,7 @@ torchtune provides the following fine-tuning recipes.
 
 &nbsp;
 
-> Tip: Single GPU recipes expose a number of memory optimizations that aren't available in the distributed versions. These include support for low-precision optimizers from [bitsandbytes](https://huggingface.co/docs/bitsandbytes/main/en/index) and fusing optimizer step with backward to reduce memory footprint from the gradients. For memory-constrained setups, we recommend using the single-device configs as a starting point
+Single GPU recipes expose a number of memory optimizations that aren't available in the distributed versions. These include support for low-precision optimizers from [bitsandbytes](https://huggingface.co/docs/bitsandbytes/main/en/index) and fusing optimizer step with backward to reduce memory footprint from the gradients. For memory-constrained setups, we recommend using the single-device configs as a starting point. For example, our default QLoRA config has a peak memory usage of ``~9.3GB``. Similarly LoRA on single device with ``batch_size=2`` has a peak memory usage of ``~15.5GB``. Both of these are with ``dtype=bf16`` and ``AdamW`` as the optimizer.
 
 &nbsp;
 
@@ -128,6 +129,7 @@ Llama2 7B + LoRA on single GPU + [Alpaca Dataset](https://huggingface.co/dataset
 tune run lora_finetune_single_device --config llama2/7B_lora_single_device
 ```
 
+For distributed training, tune CLI integrates with [torchrun](https://pytorch.org/docs/stable/elastic/run.html).
 Llama2 7B + LoRA on two GPUs + [Alpaca Dataset](https://huggingface.co/datasets/tatsu-lab/alpaca):
 
 ```bash
@@ -190,7 +192,7 @@ torchtune is designed to be easy to understand, use and extend.
 
 - Composition over implementation inheritance - layers of inheritance for code re-use makes the code hard to read and extend
 - No training frameworks - explicitly outlining the training logic makes it easy to extend for custom use cases
-- Code duplication is prefered over unecessary abstractions
+- Code duplication is preferred over unnecessary abstractions
 - Modular building blocks over monolithic components
 
 ### Correctness
