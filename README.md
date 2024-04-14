@@ -209,10 +209,11 @@ torchtune provides well-tested components with a high-bar on correctness. The li
 
 ## Community Contributions
 
-We really value our community and the contributions made by our awesome users. We'll use this section to call out some of these contributions!
+We really value our community and the contributions made by our wonderful users. We'll use this section to call out some of these contributions! If you'd like to help out as well, please see the [CONTRIBUTING](CONTRIBUTING.md) guide.
 
 - [@solitude-alive](https://github.com/solitude-alive) for adding the [Gemma 2B model](torchtune/models/gemma/) to torchtune, including recipe changes, numeric validations of the models and recipe correctness
 - [@yechenzhi](https://github.com/yechenzhi) for adding [DPO](recipes/lora_dpo_single_device.py) to torchtune, including the recipe and config along with correctness checks
+
 
 &nbsp;
 
@@ -227,12 +228,6 @@ We also want to acknowledge some awesome libraries and tools from the ecosystem:
 - [llama recipes](https://github.com/meta-llama/llama-recipes) for spring-boarding the llama2 community
 - [bitsandbytes](https://github.com/TimDettmers/bitsandbytes) for bringing several memory and performance based techniques to the PyTorch ecosystem
 - [lit-gpt](https://github.com/Lightning-AI/litgpt)
-
-&nbsp;
-
-## Contributing
-
-We welcome any feature requests, bug reports, or pull requests from the community. See the [CONTRIBUTING](CONTRIBUTING.md) file for how to help out.
 
 &nbsp;
 
