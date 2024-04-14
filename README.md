@@ -31,8 +31,7 @@ torchtune focuses on integrating with popular tools and libraries from the ecosy
 - [PyTorch FSDP](https://pytorch.org/docs/stable/fsdp.html) for distributed training
 - [torchao](https://github.com/pytorch-labs/ao) for lower precision dtypes and post-training quantization techniques
 - [Weights and Biases](https://wandb.ai/site) for tracking training progress and logging metrics
-- [ExecuT
-orch](https://pytorch.org/executorch-overview) for on-device inference
+- [ExecuTorch](https://pytorch.org/executorch-overview) for on-device inference
 
 &nbsp;
 
