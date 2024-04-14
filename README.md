@@ -117,7 +117,7 @@ torchtune provides the following fine-tuning recipes.
 
 &nbsp;
 
-> Tip: Single GPU recipes expose a number of memory optimizations that aren't available in the distributed versions. These include support for low-precision optimizers from [bitsandbytes](https://huggingface.co/docs/bitsandbytes/main/en/index) and fusing optimizer step with backward to reduce memory footprint from the gradients. For memoy-constrained setups, we recommend using the single-device configs as a starting point
+> Tip: Single GPU recipes expose a number of memory optimizations that aren't available in the distributed versions. These include support for low-precision optimizers from [bitsandbytes](https://huggingface.co/docs/bitsandbytes/main/en/index) and fusing optimizer step with backward to reduce memory footprint from the gradients. For memory-constrained setups, we recommend using the single-device configs as a starting point
 
 &nbsp;
 
