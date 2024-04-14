@@ -39,8 +39,9 @@ The library currently supports the following models.
 | Model                                         | Sizes     |
 |-----------------------------------------------|-----------|
 | [Llama2](https://llama.meta.com/llama2/)   | 7B, 13B [[models](torchtune/models/llama2/_model_builders.py), [configs](recipes/configs/llama2/)]        |
-| [Mistral](https://mistral.ai/news/announcing-mistral-7b/)   | 7B [[model](torchtune/models/mistral/_model_builders.py), [configs](recipes/configs/mistral/)] |
-| [Gemma](https://blog.google/technology/developers/gemma-open-models/)   | 2B [[model](torchtune/models/gemma/_model_builders.py), [configs](recipes/configs/gemma/)] |
+| [Mistral
+](https://huggingface.co/mistralai)   | 7B [[model](torchtune/models/mistral/_model_builders.py), [configs](recipes/configs/mistral/)] |
+| [Gemma](https://huggingface.co/collections/google/gemma-release-65d5efbccdbb8c4202ec078b)   | 2B [[model](torchtune/models/gemma/_model_builders.py), [configs](recipes/configs/gemma/)] |
 
 
 &nbsp;
