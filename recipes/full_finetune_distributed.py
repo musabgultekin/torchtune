@@ -604,8 +604,8 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
                 loss.backward()
 
                 # Gradient clipping
-                grad_norm = torch.nn.utils.clip_grad_norm_(
-                    self._model.parameters(), max_norm=1.0
+                grad_norm = self._model.clip_grad_norm_(
+                    max_norm=1.0
                 )
 
                 # Step with optimizer

@@ -526,6 +526,11 @@ class FullFinetuneRecipeSingleDevice(FTRecipeInterface):
                 running_loss += loss
                 loss.backward()
 
+                # Gradient clipping
+                grad_norm = torch.nn.utils.clip_grad_norm_(
+                    self._model.parameters(), max_norm=1.0
+                )
+
                 # Step with optimizer
                 if (idx + 1) % self._gradient_accumulation_steps == 0:
                     if not self._optimizer_in_bwd:
@@ -553,6 +558,7 @@ class FullFinetuneRecipeSingleDevice(FTRecipeInterface):
                                 else self._optimizer.param_groups[0]["lr"]
                             ),
                             "tokens_per_second_per_gpu": num_tokens / time_per_step,
+                            "grad_norm": grad_norm
                         }
                         if self._device.type == "cuda" and self._log_peak_memory_stats:
                             log_dict.update(utils.get_memory_stats(device=self._device))
