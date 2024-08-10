@@ -129,13 +129,14 @@ class InferenceRecipe:
             if chat_format:
                 chat_format = _get_component_from_path(chat_format)
                 messages = chat_format.format(messages)
-            return self._tokenizer.tokenize_messages(messages)[0]
+            return self._tokenizer.tokenize_messages(messages)[0][:-2]
 
     @torch.no_grad()
     def generate(self, cfg: DictConfig):
         tokens = self.convert_prompt_to_tokens(
             cfg.prompt, cfg.get("chat_format", None), cfg.get("instruct_template", None)
         )
+        print(tokens)
         prompt = torch.tensor(tokens, dtype=torch.int, device=self._device)
 
         custom_generate_next_token = None
@@ -171,8 +172,9 @@ class InferenceRecipe:
             custom_generate_next_token=custom_generate_next_token,
         )
         t = time.perf_counter() - t0
-
-        logger.info(self._tokenizer.decode(generated_tokens[0]))
+        decoded = self._tokenizer.decode(generated_tokens[0][len(tokens):])
+        import json
+        print(json.dumps(decoded))
 
         model_size = sum(
             [
