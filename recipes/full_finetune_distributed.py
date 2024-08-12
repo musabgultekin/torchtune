@@ -599,9 +599,10 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
                 loss.backward()
 
                 # Gradient clipping
-                grad_norm = self._model.clip_grad_norm_(
-                    max_norm=1.0
-                )
+                # Not working with FSDP2
+                #grad_norm = self._model.clip_grad_norm_(
+                #    max_norm=1.0
+                #)
 
                 # Step with optimizer
                 if (idx + 1) % self._gradient_accumulation_steps == 0:
@@ -627,7 +628,7 @@ class FullFinetuneRecipeDistributed(FTRecipeInterface):
                             "loss": loss_to_log,
                             "lr": self._optimizer.param_groups[0]["lr"],
                             "tokens_per_second_per_gpu": num_tokens / time_per_step,
-                            "grad_norm": grad_norm
+                            #"grad_norm": grad_norm
                         }
                         if self._log_peak_memory_stats:
                             log_dict.update(utils.get_memory_stats(device=self._device))
