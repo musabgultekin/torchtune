@@ -312,6 +312,12 @@ class FullFinetuneRecipeSingleDevice(FTRecipeInterface):
 
         log.info(f" Profiler config after instantiation: {profiler_cfg}")
 
+        self.profiler_profile_memory = profiler_cfg.get("profile_memory", False)
+        if profiler_cfg["enabled"]:
+            self.profiler_wait_steps = profiler_cfg["wait_steps"]
+            self.profiler_warmup_steps = profiler_cfg["warmup_steps"]
+            self.profiler_active_steps = profiler_cfg["active_steps"]
+
         return profiler
 
     def _setup_model(
@@ -329,7 +335,7 @@ class FullFinetuneRecipeSingleDevice(FTRecipeInterface):
 
         if enable_activation_checkpointing:
             utils.set_activation_checkpointing(
-                model, auto_wrap_policy={modules.TransformerDecoderLayer}
+                model, auto_wrap_policy={modules.TransformerSelfAttentionLayer}
             )
 
         model.load_state_dict(model_state_dict)
@@ -342,7 +348,9 @@ class FullFinetuneRecipeSingleDevice(FTRecipeInterface):
         if compile_model:
             log.info("Compiling model with torch.compile...")
             backend = os.environ.get("TORCH_COMPILE_BACKEND", "inductor")
-            model.compile(backend=backend)
+            self._loss_step_original = self._loss_step
+            self._loss_step = torch.compile(self._loss_step, backend=backend)
+
         if self._device.type == "cuda":
             memory_stats = utils.get_memory_stats(device=self._device)
             utils.log_memory_stats(memory_stats)
@@ -463,6 +471,26 @@ class FullFinetuneRecipeSingleDevice(FTRecipeInterface):
             intermediate_checkpoint=(epoch + 1 < self.total_epochs),
         )
 
+    def _loss_step(self, batch: Dict[str, torch.Tensor]) -> torch.Tensor:
+        # Both are shape [b, s]
+        tokens, labels = batch["tokens"], batch["labels"]
+        # Get the attention mask and position ids from the dataset if they
+        # exist. Currently, only sample packing in PackedDataset returns these
+        mask = batch.get("mask", None)  # shape [b, s, s]
+        input_pos = batch.get("input_pos", None)  # shape [b, s]
+
+        logits = self._model(tokens, mask=mask, input_pos=input_pos)
+        # Shift so that tokens < n predict n
+        logits = logits[..., :-1, :].contiguous()
+        labels = labels[..., 1:].contiguous()
+        logits = logits.transpose(1, 2)
+        # Compute loss
+        loss = self._loss_fn(logits, labels)
+        # free logits otherwise it peaks backward memory
+        del logits
+
+        return loss
+
     def train(self) -> None:
         """
         The core training loop. Supports training on subsets of the dataset using the
@@ -497,31 +525,18 @@ class FullFinetuneRecipeSingleDevice(FTRecipeInterface):
                 ):
                     break
 
-                # Both are shape [b, s]
-                tokens, labels = batch["tokens"], batch["labels"]
-                # Get the attention mask and position ids from the dataset if they
-                # exist. Currently, only sample packing in PackedDataset returns these
-                mask = batch.get("mask", None)  # shape [b, s, s]
-                input_pos = batch.get("input_pos", None)  # shape [b, s]
+                # Start tracking CUDA memory for active steps for just the first epoch
+                if (
+                    curr_epoch == 0
+                    and self.profiler_profile_memory
+                    and idx == self.profiler_wait_steps + self.profiler_warmup_steps
+                ):
+                    torch.cuda.memory._record_memory_history()
 
-                tokens = tokens.to(self._device)
-                num_tokens += tokens.numel()
-                labels = labels.to(self._device)
-                mask = mask.to(self._device) if mask is not None else None
-                input_pos = (
-                    input_pos.to(self._device) if input_pos is not None else None
-                )
+                batch = {k: v.to(self._device) for k, v in batch.items()}
+                num_tokens += batch["tokens"].numel()
 
-                logits = self._model(tokens, mask=mask, input_pos=input_pos)
-                # Shift so that tokens < n predict n
-                logits = logits[..., :-1, :].contiguous()
-                labels = labels[..., 1:].contiguous()
-                logits = logits.transpose(1, 2)
-                # Compute loss
-                loss = self._loss_fn(logits, labels)
-                # free logits otherwise it peaks backward memory
-                del logits
-
+                loss = self._loss_step(batch)
                 loss = loss / self._gradient_accumulation_steps
                 running_loss += loss
                 loss.backward()
@@ -571,6 +586,17 @@ class FullFinetuneRecipeSingleDevice(FTRecipeInterface):
                     running_loss = 0
                     num_tokens = 0
                     t0 = time.perf_counter()
+
+                # Stop tracking CUDA memory now that active steps are complete
+                if (
+                    curr_epoch == 0
+                    and self.profiler_profile_memory
+                    and idx
+                    == self.profiler_wait_steps
+                    + self.profiler_warmup_steps
+                    + self.profiler_active_steps
+                ):
+                    torch.cuda.memory._record_memory_history(enabled=None)
 
                 # Step the profiler
                 # Note we are stepping each batch, which might not include optimizer step in the trace
