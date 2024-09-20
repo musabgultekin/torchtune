@@ -19,7 +19,7 @@ import pytest
 
 import torch
 from torch import nn
-from torchtune.data import ChatFormat, Message, PromptTemplate, truncate
+from torchtune.data import Message, PromptTemplate, truncate
 from torchtune.modules.tokenizers import ModelTokenizer
 from torchtune.modules.transforms import Transform
 
@@ -145,10 +145,14 @@ class DummyTokenizer(ModelTokenizer, Transform):
         return tokenized_messages, mask
 
     def __call__(self, sample: Mapping[str, Any]) -> Mapping[str, Any]:
-        messages = sample.pop("messages")
+        messages: List[Message] = sample.pop("messages")
+        images = []
+        for message in messages:
+            images += message.get_media()
         tokens, mask = self.tokenize_messages(messages)
         sample["tokens"] = tokens
         sample["mask"] = mask
+        sample["images"] = images
         return sample
 
     @property
@@ -164,7 +168,7 @@ class DummyTokenizer(ModelTokenizer, Transform):
         return -2
 
 
-class DummyChatFormat(ChatFormat):
+class DummyChatFormat:
 
     B_SYS, E_SYS = "System:\n", "\n"
     B_INST, E_INST = "User:\n", "\nAssistant:\n"

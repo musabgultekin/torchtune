@@ -39,6 +39,7 @@ class StackExchangePairedToMessages(Transform):
             Default is False.
         column_map (Optional[Dict[str, str]]): a mapping to change the expected "prompt",
             "chosen", and "rejected" column names to the actual column names in the dataset.
+            Keys should be "prompt", "chosen", and "rejected" and values should be the actual column names.
             Default is None, keeping the default column names.
     """
 
@@ -78,6 +79,7 @@ def stack_exchange_paired_dataset(
     column_map: Optional[Dict[str, str]] = None,
     train_on_input: bool = False,
     split: str = "train",
+    **load_dataset_kwargs: Dict[str, Any],
 ) -> PreferenceDataset:
     """
     Family of preference datasets similar to the `Stack Exchange Paired dataset
@@ -93,11 +95,14 @@ def stack_exchange_paired_dataset(
             in the filepath in ``data_files``. See `Hugging Face's
             <https://huggingface.co/docs/datasets/en/package_reference/loading_methods#datasets.load_dataset.path>`_
             ``load_dataset`` for more details. Default is ``lvwerra/stack-exchange-paired``.
-        column_map (Optional[Dict[str, str]]): a mapping from the expected columns in the prompt template
-            to the new column names in the dataset. If None, assume these are identical.
+        column_map (Optional[Dict[str, str]]): a mapping to change the expected "prompt",
+            "chosen", and "rejected" column names to the actual column names in the dataset.
+            Keys should be "prompt", "chosen", and "rejected" and values should be the actual column names.
+            Default is None, keeping the default column names.
         train_on_input (bool): Whether the model is trained on the prompt or not. Default is False.
         split (str): ``split`` argument for ``datasets.load_dataset``. You can use this argument to load a subset
             of a given split, e.g. ``split="train[:10%]"``. Default is "train".
+        **load_dataset_kwargs (Dict[str, Any]): additional keyword arguments to pass to ``load_dataset``.
 
     Returns:
         PreferenceDataset: The preference dataset built from source paired data.
@@ -119,4 +124,5 @@ def stack_exchange_paired_dataset(
         tokenizer=tokenizer,
         split=split,
         data_dir="data/rl",
+        **load_dataset_kwargs,
     )

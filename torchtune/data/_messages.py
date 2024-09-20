@@ -27,15 +27,13 @@ class Message:
         role (Role): role of the message writer. Can be "system" for system prompts,
             "user" for human prompts, "assistant" for model responses, or "ipython"
             for tool call returns.
-        content (Union[str, List[Dict[str, str]]]): content of the message. If it is text only content,
+        content (Union[str, List[Dict[str, Any]]]): content of the message. If it is text only content,
             you can pass in a string. If it is multimodal content, pass in a list of dictionaries formatted
             as follows::
 
                 [
-                    {"type": "image"}
-                    {"type": "text", "content": "hello"},
-                    {"type": "image"}
-                    {"type": "text", "content": "world"},
+                    {"type": "image", "content": <PIL.Image.Image>},
+                    {"type": "text", "content": "What is in this image?"},
                 ]
 
         masked (bool): whether the message is masked in the sample. If True, do not use
@@ -48,27 +46,39 @@ class Message:
             - For multiple consecutive assistant messages (i.e., tool calls
               by assistant), only the last assistant message will have ``eot=True``
             - All ipython messages (tool call returns) should set ``eot=False``.
+
+    Note:
+        Message class expects any image content to be in
+        `PIL Image format <https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image>`_.
     """
 
     def __init__(
         self,
         role: Role,
-        content: Union[str, List[Dict[str, str]]],
+        content: Union[str, List[Dict[str, Any]]],
         masked: bool = False,
         ipython: bool = False,
         eot: bool = True,
     ):
         self.role = role
-        self.content = (
-            [{"type": "text", "content": content}]
-            if isinstance(content, str)
-            else content
-        )
+        self.content = self._convert_to_list_of_dict(content)
         self.masked = masked
         self.ipython = ipython
         self.eot = eot
 
         self._validate_message()
+
+    def _convert_to_list_of_dict(self, content) -> List[Dict[str, Any]]:
+        """User is currently allowed to pass in a string for text-only content.
+        This ensures that the content is formatted as a list of dictionaries."""
+        if isinstance(content, str):
+            return [{"type": "text", "content": content}]
+
+        assert isinstance(
+            content, list
+        ), f"content must be of type List[Dict[str, Any]], got {content}"
+
+        return content
 
     @classmethod
     def from_dict(cls, d: dict) -> "Message":
@@ -89,12 +99,20 @@ class Message:
             eot=d.get("eot", True),
         )
 
+    def get_media(self) -> List["PIL.Image.Image"]:
+        """
+        Returns media content of the message.
+        """
+        return [
+            content["content"] for content in self.content if content["type"] == "image"
+        ]
+
     @property
     def contains_media(self) -> bool:
         """
-        Returns True if message contains non-text content.
+        Returns whether the message contains media.
         """
-        return any(content["type"] != "text" for content in self.content)
+        return any(content["type"] == "image" for content in self.content)
 
     @property
     def text_content(self) -> str:
@@ -121,13 +139,18 @@ class InputOutputToMessages(Transform):
     Message transform class that converts a single sample with "input" and "output" fields,
     (or equivalent fields specified in column_map) to user and assistant messages,
     respectively. This is useful for datasets that have two columns, one containing
-    the user prompt and the other containing the model response.
+    the user prompt string and the other containing the model response string::
+
+        |  input          |  output          |
+        |-----------------|------------------|
+        | "user prompt"   | "model response" |
 
     Args:
         train_on_input (bool): Whether the model is trained on the user prompt or not.
             Default is False.
         column_map (Optional[Dict[str, str]]): a mapping to change the expected "input"
-            and "output" column names to the actual column names in the dataset. Default is None,
+            and "output" column names to the actual column names in the dataset. Keys should
+            be "input" and "output" and values should be the actual column names. Default is None,
             keeping the default "input" and "output" column names.
         new_system_prompt (Optional[str]): if specified, prepend a system message. This can
             serve as instructions to guide the model response. Default is None.
@@ -213,6 +236,7 @@ class ChosenRejectedToMessages(Transform):
             Default is False.
         column_map (Optional[Dict[str, str]]): a mapping to change the expected
             "chosen" and "rejected" column names to the actual column names in the dataset.
+            Keys should be "chosen" and "rejected" and values should be the actual column names.
             Default is None, keeping the default column names.
         new_system_prompt (Optional[str]): if specified, prepend a system message. This can
             serve as instructions to guide the model response. Setting this will OVERRIDE any system
@@ -311,7 +335,8 @@ class ShareGPTToMessages(Transform):
     Args:
         train_on_input (bool): whether the prompt should remain unmasked. Default: False
         column_map (Optional[Dict[str, str]]): a mapping from the expected columns ("conversations")
-            to the new column names in the dataset. If None, assume these are identical.
+            to the new column names in the dataset. Key should be "conversations" and value should
+            be the new column name. If None, keep the default "conversations".
             Default is None.
         new_system_prompt (Optional[str]): if specified, prepend a system message. This can
             serve as instructions to guide the model response. Setting this will OVERRIDE any system
@@ -401,7 +426,8 @@ class JSONToMessages(Transform):
     Args:
         train_on_input (bool): whether the prompt should remain unmasked. Default: False
         column_map (Optional[Dict[str, str]]): a mapping from the expected columns ("messages")
-            to the new column names in the dataset. If None, assume these are identical.
+            to the new column names in the dataset. Key should be "messages" and value should be
+            the new column name. If None, keep the default "messages".
             Default is None.
         new_system_prompt (Optional[str]): if specified, prepend a system message. This can
             serve as instructions to guide the model response. Setting this will OVERRIDE any system
@@ -455,3 +481,45 @@ class JSONToMessages(Transform):
             updated_messages.append(Message.from_dict(message))
 
         return {"messages": updated_messages}
+
+
+def validate_messages(
+    messages: List[Message],
+) -> None:
+    """
+    Given a list of messages, ensure that messages form a valid
+    back-and-forth conversation. An error will be raised if:
+
+    - There is a system message that's not the first message
+    - There are two consecutive user messages
+    - An assistant message comes before the first user message
+    - The message is empty
+    - Messages are shorter than length of 2 (min. one user-assistant turn)
+
+
+    Args:
+        messages (List[Message]): the messages to validate.
+
+    Raises:
+        ValueError: If the messages are invalid.
+    """
+    if len(messages) < 2:
+        raise ValueError(
+            f"Messages must be at least length 2, but got {len(messages)} messages"
+        )
+
+    last_turn = "assistant"
+    for i, message in enumerate(messages):
+        if message.role == "assistant" and last_turn != "user":
+            raise ValueError(
+                f"Assistant message before expected user message at index {i} in messages"
+            )
+        if message.role == "user" and last_turn == "user":
+            raise ValueError(
+                f"Two consecutive user messages at index {i} and {i - 1} in messages"
+            )
+        if message.role == "system" and i > 0:
+            raise ValueError(
+                f"System message at index {i} in messages, but system messages must come first"
+            )
+        last_turn = message.role
